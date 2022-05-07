@@ -141,7 +141,6 @@ const populateBreaks = (breaks, screenWidth, dayStart) => {
   calculatedBreaks = rows.map((row) => {
     return buildEvent(row, 0, screenWidth, dayStart);
   })
-  console.log(calculatedBreaks, '---');
   return calculatedBreaks;
 };
 

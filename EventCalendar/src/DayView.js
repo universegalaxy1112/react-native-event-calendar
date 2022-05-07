@@ -1,9 +1,11 @@
 // @flow
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+
 import { populateEvents, populateBreaks } from './Packer';
 import React from 'react';
 import moment from 'moment';
 import _ from 'lodash';
+import CssGradient from './components/CssGradient';
 
 const LEFT_MARGIN = 60 - 1;
 // const RIGHT_MARGIN = 10
@@ -206,11 +208,19 @@ export default class DayView extends React.PureComponent {
         width: brk.width,
         top: brk.top,
       };
-
-      return <View key={i} style={[styles.break, style]} />
+      const gradient = `repeating-linear-gradient(-45deg,
+                                                  transparent,
+                                                  transparent 8px,
+                                                  #ccc 8px,
+                                                  #ccc 16px)`;
+      return (
+        <CssGradient gradient={gradient} key={i} style={[styles.break, style]}>
+          <View />
+        </CssGradient>
+      );
     });
 
-    return <View style={{ marginLeft: LEFT_MARGIN  }}>{breaks}</View>;
+    return <View style={{ marginLeft: LEFT_MARGIN }}>{breaks}</View>;
   }
 
   render() {
