@@ -119,28 +119,22 @@ const populateBreaks = (breaks, screenWidth, dayStart) => {
     });
 
   rows = [];
-  lastEnd = null;
   breaks.forEach(function (brk) {
-    if (lastEnd !== null && brk.start >= lastEnd) {
-      lastEnd = null;
-    }
 
     let placed = false;
     for (let i = 0; i < rows.length; i++) {
       let row = rows[i];
       if (collision(row, brk)) {
         placed = true;
-        row.end = brk.end
+        if (brk.end > row.end) {
+          row.end = brk.end;
+        }
         break;
       }
     }
 
     if (!placed) {
       rows.push(brk);
-    }
-
-    if (lastEnd === null || brk.end > lastEnd) {
-      lastEnd = brk.end;
     }
   });
 
