@@ -24,8 +24,9 @@ export default class DayView extends React.PureComponent {
     super(props);
     this.calendarHeight = (props.end - props.start) * 100;
     const width = props.width - LEFT_MARGIN;
+    const breakWidth = props.width - LEFT_MARGIN + 10
     const packedEvents = populateEvents(props.events, width, props.start);
-    const packedBreaks = populateBreaks(props.breaks, width, props.start);
+    const packedBreaks = populateBreaks(props.breaks, breakWidth, props.start);
     let initPosition =
       _.min(_.map(packedEvents, 'top')) -
       this.calendarHeight / (props.end - props.start);
@@ -39,8 +40,10 @@ export default class DayView extends React.PureComponent {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const width = nextProps.width - LEFT_MARGIN;
+    const breakWidth = nextProps.width - LEFT_MARGIN + 10;
     this.setState({
       packedEvents: populateEvents(nextProps.events, width, nextProps.start),
+      packedBreaks: populateBreaks(nextProps.breaks, breakWidth, nextProps.start),
     });
   }
 
@@ -208,7 +211,7 @@ export default class DayView extends React.PureComponent {
         width: brk.width,
         top: brk.top,
       };
-      const gradient = `repeating-linear-gradient(-45deg,
+      const gradient = `repeating-linear-gradient(45deg,
                                                   transparent,
                                                   transparent 8px,
                                                   #ccc 8px,
@@ -220,7 +223,7 @@ export default class DayView extends React.PureComponent {
       );
     });
 
-    return <View style={{ marginLeft: LEFT_MARGIN }}>{breaks}</View>;
+    return <View style={{ marginLeft: LEFT_MARGIN - 10 }}>{breaks}</View>;
   }
 
   render() {

@@ -65,7 +65,6 @@ export default function styleConstructor(theme = {}, calendarHeight) {
     },
     break: {
       position: 'absolute',
-      backgroundColor: '#888888',
       opacity: 0.8,
       borderColor: '#DDE5FD',
       borderWidth: 1,

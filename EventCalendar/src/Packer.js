@@ -104,7 +104,6 @@ function populateEvents(events, screenWidth, dayStart) {
 }
 
 const populateBreaks = (breaks, screenWidth, dayStart) => {
-  let lastEnd;
   let rows;
   let calculatedBreaks = [];
 

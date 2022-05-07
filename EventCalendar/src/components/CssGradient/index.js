@@ -12,10 +12,9 @@ const CssGradient = ({ gradient, children, style }) => {
   // react-native-linear-gradient.
 
   const generated = generateGradient(gradient, {
-    width: 1200,
-    height: 100,
+    width: 600,
+    height: 600,
   });
-  console.log(generated)
   if (generated.length > 1) {
     return (
       <View style={[style, { position: 'relative' }]}>
