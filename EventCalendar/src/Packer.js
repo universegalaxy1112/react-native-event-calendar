@@ -7,10 +7,7 @@ function buildEvent(column, left, width, dayStart) {
   const endTime = column.end
     ? moment(column.end)
     : startTime.clone().add(1, 'hour');
-  const dayStartTime = startTime
-    .clone()
-    .hour(dayStart)
-    .minute(0);
+  const dayStartTime = startTime.clone().hour(dayStart).minute(0);
   const diffHours = startTime.diff(dayStartTime, 'hours', true);
 
   column.top = diffHours * offset;
@@ -64,7 +61,7 @@ function populateEvents(events, screenWidth, dayStart) {
 
   events = events
     .map((ev, index) => ({ ...ev, index: index }))
-    .sort(function(a, b) {
+    .sort(function (a, b) {
       if (a.start < b.start) return -1;
       if (a.start > b.start) return 1;
       if (a.end < b.end) return -1;
@@ -74,8 +71,7 @@ function populateEvents(events, screenWidth, dayStart) {
 
   columns = [];
   lastEnd = null;
-
-  events.forEach(function(ev, index) {
+  events.forEach(function (ev, index) {
     if (lastEnd !== null && ev.start >= lastEnd) {
       pack(columns, screenWidth, calculatedEvents, dayStart);
       columns = [];
@@ -107,4 +103,52 @@ function populateEvents(events, screenWidth, dayStart) {
   return calculatedEvents;
 }
 
-export default populateEvents;
+const populateBreaks = (breaks, screenWidth, dayStart) => {
+  let lastEnd;
+  let rows;
+  let calculatedBreaks = [];
+
+  breaks = breaks
+    .map((brk, index) => ({ ...brk, index: index }))
+    .sort(function (a, b) {
+      if (a.start < b.start) return -1;
+      if (a.start > b.start) return 1;
+      if (a.end < b.end) return -1;
+      if (a.end > b.end) return 1;
+      return 0;
+    });
+
+  rows = [];
+  lastEnd = null;
+  breaks.forEach(function (brk) {
+    if (lastEnd !== null && brk.start >= lastEnd) {
+      lastEnd = null;
+    }
+
+    let placed = false;
+    for (let i = 0; i < rows.length; i++) {
+      let row = rows[i];
+      if (collision(row, brk)) {
+        placed = true;
+        row.end = brk.end
+        break;
+      }
+    }
+
+    if (!placed) {
+      rows.push(brk);
+    }
+
+    if (lastEnd === null || brk.end > lastEnd) {
+      lastEnd = brk.end;
+    }
+  });
+
+  calculatedBreaks = rows.map((row) => {
+    return buildEvent(row, 0, screenWidth, dayStart);
+  })
+  console.log(calculatedBreaks, '---');
+  return calculatedBreaks;
+};
+
+export { populateEvents, populateBreaks };

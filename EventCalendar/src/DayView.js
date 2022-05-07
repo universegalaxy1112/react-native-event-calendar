@@ -1,6 +1,6 @@
 // @flow
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import populateEvents from './Packer';
+import { populateEvents, populateBreaks } from './Packer';
 import React from 'react';
 import moment from 'moment';
 import _ from 'lodash';
@@ -23,6 +23,7 @@ export default class DayView extends React.PureComponent {
     this.calendarHeight = (props.end - props.start) * 100;
     const width = props.width - LEFT_MARGIN;
     const packedEvents = populateEvents(props.events, width, props.start);
+    const packedBreaks = populateBreaks(props.breaks, width, props.start);
     let initPosition =
       _.min(_.map(packedEvents, 'top')) -
       this.calendarHeight / (props.end - props.start);
@@ -30,10 +31,11 @@ export default class DayView extends React.PureComponent {
     this.state = {
       _scrollY: initPosition,
       packedEvents,
+      packedBreaks,
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const width = nextProps.width - LEFT_MARGIN;
     this.setState({
       packedEvents: populateEvents(nextProps.events, width, nextProps.start),
@@ -64,7 +66,7 @@ export default class DayView extends React.PureComponent {
     const timeNowMin = moment().minutes();
     return (
       <View
-        key={`timeNow`}
+        key={'timeNow'}
         style={[
           styles.lineNow,
           {
@@ -85,13 +87,13 @@ export default class DayView extends React.PureComponent {
     return range(start, end + 1).map((i, index) => {
       let timeText;
       if (i === start) {
-        timeText = ``;
+        timeText = '';
       } else if (i < 12) {
         timeText = !format24h ? `${i} AM` : i;
       } else if (i === 12) {
         timeText = !format24h ? `${i} PM` : i;
       } else if (i === 24) {
-        timeText = !format24h ? `12 AM` : 0;
+        timeText = !format24h ? '12 AM' : 0;
       } else {
         timeText = !format24h ? `${i - 12} PM` : i;
       }
@@ -156,10 +158,9 @@ export default class DayView extends React.PureComponent {
       return (
         <TouchableOpacity
           activeOpacity={0.5}
-          onPress={() =>
-            this._onEventTapped(this.props.events[event.index])
-          }
-          key={i} style={[styles.event, style, event.color && eventColor]}
+          onPress={() => this._onEventTapped(this.props.events[event.index])}
+          key={i}
+          style={[styles.event, style, event.color && eventColor]}
         >
           {this.props.renderEvent ? (
             this.props.renderEvent(event)
@@ -182,7 +183,7 @@ export default class DayView extends React.PureComponent {
                   {moment(event.end).format(formatTime)}
                 </Text>
               ) : null}
-              </View>
+            </View>
           )}
         </TouchableOpacity>
       );
@@ -195,11 +196,28 @@ export default class DayView extends React.PureComponent {
     );
   }
 
+  _renderBreaks() {
+    const { styles } = this.props;
+    const { packedBreaks } = this.state;
+    let breaks = packedBreaks.map((brk, i) => {
+      const style = {
+        left: brk.left,
+        height: brk.height,
+        width: brk.width,
+        top: brk.top,
+      };
+
+      return <View key={i} style={[styles.break, style]} />
+    });
+
+    return <View style={{ marginLeft: LEFT_MARGIN  }}>{breaks}</View>;
+  }
+
   render() {
     const { styles } = this.props;
     return (
       <ScrollView
-        ref={ref => (this._scrollView = ref)}
+        ref={(ref) => (this._scrollView = ref)}
         contentContainerStyle={[
           styles.contentStyle,
           { width: this.props.width },
@@ -207,6 +225,7 @@ export default class DayView extends React.PureComponent {
       >
         {this._renderLines()}
         {this._renderEvents()}
+        {this._renderBreaks()}
         {this._renderRedLine()}
       </ScrollView>
     );

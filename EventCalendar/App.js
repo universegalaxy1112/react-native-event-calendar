@@ -1,9 +1,9 @@
 import React from 'react';
-import {Dimensions, View} from 'react-native';
+import { Dimensions, View } from 'react-native';
 
 import EventCalendar from './src/EventCalendar';
 
-let {width} = Dimensions.get('window');
+let { width } = Dimensions.get('window');
 
 export default class App extends React.Component {
   constructor(props) {
@@ -31,7 +31,7 @@ export default class App extends React.Component {
         },
         {
           start: '2017-09-07 01:05:00',
-          end: '2017-09-07 01:45:00',
+          end: '2017-09-07 02:45:00',
           title: 'Dr. Mariana Joseph',
           summary: '3412 Piedmont Rd NE, GA 3032',
         },
@@ -112,11 +112,13 @@ export default class App extends React.Component {
   }
 
   render() {
+    const { events, breaks } = this.state;
     return (
-      <View style={{flex: 1, marginTop: 20}}>
+      <View style={{ flex: 1, marginTop: 20 }}>
         <EventCalendar
           eventTapped={this._eventTapped.bind(this)}
-          events={this.state.events}
+          events={events}
+          breaks={breaks}
           width={width}
           initDate={'2017-09-07'}
           upperCaseHeader

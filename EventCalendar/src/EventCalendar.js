@@ -51,19 +51,29 @@ export default class EventCalendar extends React.Component {
     return { length: width, offset: width * index, index };
   }
 
-  _getItem(events, index) {
-    console.log(index)
+  _getItem(data, index) {
     const date = moment(this.props.initDate).add(
       index - this.props.size,
       'days'
     );
-    return _.filter(events, event => {
+    const events = _.filter(data.events, event => {
       const eventStartTime = moment(event.start);
       return (
         eventStartTime >= date.clone().startOf('day') &&
         eventStartTime <= date.clone().endOf('day')
       );
-    });
+    })
+    const breaks = _.filter(data.breaks, item => {
+      const breakStartTime = moment(item.start);
+      return (
+        breakStartTime >= date.clone().startOf('day') &&
+        breakStartTime <= date.clone().endOf('day')
+      );
+    })
+    return {
+      events,
+      breaks,
+    };
   }
 
   _renderItem({ index, item }) {
@@ -77,6 +87,8 @@ export default class EventCalendar extends React.Component {
       formatHeader,
       upperCaseHeader = false,
     } = this.props;
+
+    const { events, breaks } = item;
     const date = moment(initDate).add(index - this.props.size, 'days');
 
     const leftIcon = this.props.headerIconLeft ? (
@@ -121,7 +133,8 @@ export default class EventCalendar extends React.Component {
           headerStyle={this.props.headerStyle}
           renderEvent={this.props.renderEvent}
           eventTapped={this.props.eventTapped}
-          events={item}
+          events={events}
+          breaks={breaks}
           width={width}
           styles={this.styles}
           scrollToFirst={scrollToFirst}
@@ -180,9 +193,13 @@ export default class EventCalendar extends React.Component {
       width,
       virtualizedListProps,
       events,
+      breaks,
       initDate,
     } = this.props;
-
+    const data = {
+      events,
+      breaks,
+    }
     return (
       <View style={[this.styles.container, { width }]}>
         <VirtualizedList
@@ -190,7 +207,7 @@ export default class EventCalendar extends React.Component {
           windowSize={2}
           initialNumToRender={2}
           initialScrollIndex={this.props.size}
-          data={events}
+          data={data}
           getItemCount={() => this.props.size * 2}
           getItem={this._getItem.bind(this)}
           keyExtractor={(item, index) => index.toString()}
